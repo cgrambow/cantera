@@ -5,14 +5,23 @@
 Description of what this does.
 """
 
-import re
+
+# Standard library
 import cPickle as pickle
 import numpy as np
+import re
+
+# Dependencies
 import cantera as ct
-import batchReactor_functions as cthf
-from plot import plot_profiles
 from rmgpy.species import Species
 from rmgpy.tools.data import GenericData
+
+# Modules
+import batchReactor_functions as cthf
+from plot import plot_profiles
+
+# User input
+from user_input import *
 
 
 def initialize_reactor(gas, sensitivity_species):
