@@ -1,27 +1,19 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
-Description of what this does.
+Created on Mon Jun 26 14:37:31 2017
+
+@author: smercha
 """
 
-
-# Standard library
+#import sys
+import re
 import cPickle as pickle
 import numpy as np
-import re
-
-# Dependencies
 import cantera as ct
-from rmgpy.species import Species
-from rmgpy.tools.data import GenericData
-
-# Modules
 import batchReactor_functions as cthf
 from plot import plot_profiles
-
-# User input
-from user_input import *
+from rmgpy.species import Species
+from rmgpy.tools.data import GenericData
 
 
 def initialize_reactor(gas, sensitivity_species):
@@ -37,6 +29,46 @@ def initialize_reactor(gas, sensitivity_species):
 
     return r, sim
 
+#################### USER INPUT #######################################
+##############################################################################
+##############################################################################
+
+# Import Mechanism
+#ct.add_directory('/home/smercha/combustion/')
+mechanism = 'chem_annotated.cti'
+
+# make plots?
+plot = True
+    
+# Define initial state of reactor T (K), D (kg/m**3)
+T = 450 # K
+#P = 1.0 # atm
+D = 550 #kg/m**3
+
+# names of initial reactants in the cti file
+O2_name = 'oxygen(2)'
+basestock_name = 'octane(1)'
+
+# concentration of initial reactants
+O2_c0 = 8.042e-4
+basestock_c0 = 1 - O2_c0
+
+# Sensitivity analysis
+# sensitivity_species = ['C16H32(4)']
+sensitivity_species = []
+
+# Initial time step (seconds)
+dt = 1
+
+# write output every d_out seconds
+d_out = 100
+
+#write screen output every d_s_out seconds
+d_s_out = 10
+
+# number of hours to run
+# run_time_hours = 24
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -45,14 +77,14 @@ def initialize_reactor(gas, sensitivity_species):
 gas = ct.Solution(mechanism)
 
 # set Temp, Density, Composition of initial mixture
-gas.TDX = T, D, 'C16H32(4):{0},oxygen(3):{1}'.format(basestock_c0,O2_c0)
+gas.TDX = T, D, 'octane(1):{0},oxygen(2):{1}'.format(basestock_c0,O2_c0)
 
 # get the names of all the species
 species_names = gas.species_names
 # create a look to find the index of oxygen so we can reset it,
 # thus implimenting constant concentration of oxygen
 n_mech = len(species_names)
-index_O2 = [i for i,s in enumerate(species_names) if ('oxygen(3)') == s]
+index_O2 = [i for i,s in enumerate(species_names) if ('oxygen(2)') == s]
 
 # Intial mass fraction for O2 and N2
 O2_0 = gas.X[index_O2]
@@ -72,7 +104,7 @@ time = 0.0
 
 
 # number of seconds to run
-run_time = run_time_hours * 3600
+run_time = 1e5
 
 # No of steps
 #N = run_time / dt
